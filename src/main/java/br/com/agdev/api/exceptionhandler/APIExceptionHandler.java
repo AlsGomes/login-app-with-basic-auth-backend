@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import br.com.agdev.domain.exceptions.ObjectNotFoundException;
+import br.com.agdev.domain.exceptions.UnathorizedDataAccessException;
 
 @ControllerAdvice
 public class APIExceptionHandler extends ResponseEntityExceptionHandler {
@@ -39,6 +41,17 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 		return handleExceptionInternal(ex, error, new HttpHeaders(), status, request);
 	}
 	
+	@ExceptionHandler(UnathorizedDataAccessException.class)
+	public ResponseEntity<?> handleUnathorizedDataAccessException(UnathorizedDataAccessException ex, WebRequest request){
+		HttpStatus status = HttpStatus.UNAUTHORIZED;
+		ErrorType errorType = ErrorType.UNATHORIZED_DATA_ACCESS;
+		String detail = ex.getMessage();
+		
+		DefaultError error = createDefaultErrorBuilder(status, errorType, detail).build();		
+		
+		return handleExceptionInternal(ex, error, new HttpHeaders(), status, request);
+	}
+
 	@ExceptionHandler(SQLIntegrityConstraintViolationException.class)
 	public ResponseEntity<?> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException ex, WebRequest request){
 		HttpStatus status = HttpStatus.CONFLICT;
@@ -80,12 +93,17 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		BindingResult bindingResult = ex.getBindingResult();
 		
-		List<DefaultError.Field> fields = bindingResult.getFieldErrors().stream()
-				.map(fieldError -> {
-					String msg = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
+		List<DefaultError.Object> problemObjects = bindingResult.getAllErrors().stream()
+				.map(objectError -> {
+					String msg = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
 					
-					return DefaultError.Field.builder()
-							.propertyName(fieldError.getField())
+					String name = objectError.getObjectName();
+					if (objectError instanceof FieldError) {
+						name = ((FieldError) objectError).getField();
+					}
+					
+					return DefaultError.Object.builder()
+							.propertyName(name)
 							.message(msg)
 							.build();
 				})
@@ -95,7 +113,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 		String detail = "Um ou mais campos foram preenchidos de forma inválida";
 		
 		DefaultError error = createDefaultErrorBuilder(status, errorType, detail)
-				.fields(fields)
+				.objects(problemObjects)
 				.build();		
 		
 		return handleExceptionInternal(ex, error, new HttpHeaders(), status, request);

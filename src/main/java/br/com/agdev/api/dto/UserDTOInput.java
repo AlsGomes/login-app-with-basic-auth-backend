@@ -4,13 +4,12 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
+import br.com.agdev.api.dto.validation.EqualityBetween;
+import br.com.agdev.api.dto.validation.Password;
 import lombok.Data;
 
 @Data
-@JsonInclude(Include.NON_NULL)
+@EqualityBetween(fields = { "password", "confirmationPassword" })
 public class UserDTOInput {
 
 	@NotBlank
@@ -21,11 +20,11 @@ public class UserDTOInput {
 	@Email
 	private String email;
 
-	@NotBlank
+	@Password(restrictions = { ":", "@" })
 	@Size(min = 8, max = 70)
 	private String password;
 
-	@NotBlank
+	@Password(restrictions = { ":", "@" })
 	@Size(min = 8, max = 70)
 	private String confirmationPassword;
 }
