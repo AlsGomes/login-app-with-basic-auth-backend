@@ -21,6 +21,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import br.com.agdev.core.security.exceptions.AuthenticationException;
 import br.com.agdev.domain.exceptions.ObjectNotFoundException;
 import br.com.agdev.domain.exceptions.UnathorizedDataAccessException;
 
@@ -45,6 +46,17 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<?> handleUnathorizedDataAccessException(UnathorizedDataAccessException ex, WebRequest request){
 		HttpStatus status = HttpStatus.UNAUTHORIZED;
 		ErrorType errorType = ErrorType.UNATHORIZED_DATA_ACCESS;
+		String detail = ex.getMessage();
+		
+		DefaultError error = createDefaultErrorBuilder(status, errorType, detail).build();		
+		
+		return handleExceptionInternal(ex, error, new HttpHeaders(), status, request);
+	}
+	
+	@ExceptionHandler(AuthenticationException.class)
+	public ResponseEntity<?> handleAuthenticationException(AuthenticationException ex, WebRequest request){
+		HttpStatus status = HttpStatus.UNAUTHORIZED;
+		ErrorType errorType = ErrorType.INVALID_AUTHENTICATION;
 		String detail = ex.getMessage();
 		
 		DefaultError error = createDefaultErrorBuilder(status, errorType, detail).build();		

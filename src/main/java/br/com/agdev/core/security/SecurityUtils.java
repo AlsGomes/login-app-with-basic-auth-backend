@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class SecurityUtils {
 
-	private static PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
 	public static void main(String[] args) {
 		String passwordToEncode = "123";
@@ -13,6 +13,6 @@ public class SecurityUtils {
 	}
 
 	private static void encodeWithDefaultEncoder(String passwordToEncode) {
-		System.out.println(passwordEncoder.encode(passwordToEncode));
+		System.out.println(PASSWORD_ENCODER.encode(passwordToEncode));
 	}
 }

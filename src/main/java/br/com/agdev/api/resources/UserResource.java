@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import br.com.agdev.api.dto.UserDTO;
-import br.com.agdev.api.dto.UserDTOInput;
-import br.com.agdev.api.dto.UserDTOUpdate;
+import br.com.agdev.api.dto.security.ChangePasswordDTO;
+import br.com.agdev.api.dto.user.UserDTO;
+import br.com.agdev.api.dto.user.UserDTOInput;
+import br.com.agdev.api.dto.user.UserDTOUpdate;
 import br.com.agdev.api.mapper.user.UserInputMapper;
 import br.com.agdev.api.mapper.user.UserMapper;
 import br.com.agdev.api.mapper.user.UserUpdateMapper;
@@ -68,8 +69,14 @@ public class UserResource {
 	public ResponseEntity<Void> update(@RequestBody @Valid UserDTOUpdate updateDTO, @PathVariable Long id) {
 		User entity = service.findById(id);
 		updateMapper.copyPropertiesToEntity(entity, updateDTO);
-		entity = service.save(entity);
+		entity = service.update(entity);
 
+		return ResponseEntity.noContent().build();
+	}
+	
+	@PutMapping("/change-my-password")
+	public ResponseEntity<Void> changeMyPassword(@RequestBody @Valid ChangePasswordDTO changePassDTO) {
+		service.changeMyOwnPassword(changePassDTO);
 		return ResponseEntity.noContent().build();
 	}
 

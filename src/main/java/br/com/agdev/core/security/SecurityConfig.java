@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 	
-	private static final String[] PUBLIC_MATCHERS = { "/api/users", "/api/login" };
+	private static final String[] PUBLIC_MATCHERS = { "/api/users", "/api/authentication/**" };
 
 	@Bean
 	public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {

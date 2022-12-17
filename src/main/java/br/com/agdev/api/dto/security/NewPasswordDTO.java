@@ -1,6 +1,5 @@
-package br.com.agdev.api.dto;
+package br.com.agdev.api.dto.security;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -10,15 +9,10 @@ import lombok.Data;
 
 @Data
 @EqualityBetween(fields = { "password", "confirmationPassword" })
-public class UserDTOInput {
+public class NewPasswordDTO {
 
 	@NotBlank
-	@Size(min = 3, max = 70)
-	private String name;
-
-	@NotBlank
-	@Email
-	private String email;
+	private String token;
 
 	@Password(restrictions = { ":", "@" })
 	@Size(min = 8, max = 70)

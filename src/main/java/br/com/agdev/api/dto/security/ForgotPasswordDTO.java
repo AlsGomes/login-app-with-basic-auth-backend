@@ -1,4 +1,4 @@
-package br.com.agdev.api.dto;
+package br.com.agdev.api.dto.security;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -6,12 +6,9 @@ import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class LoginDTO {
+public class ForgotPasswordDTO {
 
+	@NotBlank
 	@Email
-	@NotBlank
 	private String email;
-
-	@NotBlank
-	private String password;
 }
