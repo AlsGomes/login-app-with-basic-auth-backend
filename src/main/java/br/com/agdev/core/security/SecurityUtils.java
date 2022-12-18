@@ -8,7 +8,7 @@ public class SecurityUtils {
 	private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
 	public static void main(String[] args) {
-		String passwordToEncode = "123";
+		String passwordToEncode = "12345678";
 		encodeWithDefaultEncoder(passwordToEncode);
 	}
 
