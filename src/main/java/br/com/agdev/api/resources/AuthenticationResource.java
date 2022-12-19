@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.agdev.api.dto.security.ForgotPasswordDTO;
 import br.com.agdev.api.dto.security.LoginDTO;
 import br.com.agdev.api.dto.security.NewPasswordDTO;
+import br.com.agdev.api.dto.user.UserDTOPermission;
+import br.com.agdev.api.mapper.user.UserPermissionMapper;
+import br.com.agdev.domain.model.User;
 import br.com.agdev.domain.services.AuthenticationService;
 
 @RestController
@@ -18,15 +21,18 @@ import br.com.agdev.domain.services.AuthenticationService;
 public class AuthenticationResource {
 
 	private AuthenticationService authenticationService;
+	private UserPermissionMapper userPermissionMapper;
 
 	public AuthenticationResource(AuthenticationService authenticationService) {
 		this.authenticationService = authenticationService;
+		this.userPermissionMapper = new UserPermissionMapper();
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Void> login(@RequestBody @Valid LoginDTO dto) {
-		authenticationService.authenticate(dto);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<UserDTOPermission> login(@RequestBody @Valid LoginDTO loginDto) {
+		User user = authenticationService.authenticate(loginDto);
+		UserDTOPermission userPermissionDto = userPermissionMapper.toDTO(user);
+		return ResponseEntity.ok(userPermissionDto);
 	}
 
 	@PostMapping("/forgot-password")

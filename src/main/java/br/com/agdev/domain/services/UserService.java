@@ -10,20 +10,27 @@ import br.com.agdev.api.dto.security.ChangePasswordDTO;
 import br.com.agdev.core.security.exceptions.AuthenticationException;
 import br.com.agdev.domain.exceptions.ObjectNotFoundException;
 import br.com.agdev.domain.exceptions.UnathorizedDataAccessException;
+import br.com.agdev.domain.model.Permission;
 import br.com.agdev.domain.model.User;
+import br.com.agdev.domain.repositories.PermissionRepository;
 import br.com.agdev.domain.repositories.UserRepository;
 
 @Service
 public class UserService {
 
+	private static final long ID_PERMISSION_BASIC = 2L;
+	
 	private UserRepository repository;
+	private PermissionRepository permissionRepository;
 	private PasswordEncoder passwordEncoder;
 
 	public UserService(
-			UserRepository repository, 
+			UserRepository repository,
+			PermissionRepository permissionRepository,
 			PasswordEncoder passwordEncoder) {
 
 		this.repository = repository;
+		this.permissionRepository = permissionRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
 
@@ -53,6 +60,7 @@ public class UserService {
 	@Transactional
 	public User save(User user) {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		addInitialPermissionFor(user);		
 		return repository.save(user);
 	}
 
@@ -98,5 +106,12 @@ public class UserService {
 				() -> new ObjectNotFoundException(String.format("Não existe usuário com o e-mail %s", email)));
 
 		return AuthenticationService.currentUser().getUsername().equals(user.getEmail());
+	}
+	
+	private void addInitialPermissionFor(User user) {
+		Permission basicPermission = permissionRepository.findById(ID_PERMISSION_BASIC).orElseThrow(
+				() -> new ObjectNotFoundException(String.format("Permissão com ID %s não existe", ID_PERMISSION_BASIC)));
+		
+		user.getPermissions().add(basicPermission);
 	}
 }

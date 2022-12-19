@@ -3,6 +3,7 @@ package br.com.agdev.core.security;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.agdev.domain.exceptions.ObjectNotFoundException;
 import br.com.agdev.domain.model.User;
@@ -22,6 +24,7 @@ public class AppUserDetailsService implements UserDetailsService {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Transactional(readOnly = true)
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		var user = userRepository.findByEmail(email).orElseThrow(
@@ -31,16 +34,12 @@ public class AppUserDetailsService implements UserDetailsService {
 	}
 
 	private Collection<? extends GrantedAuthority> getAuthorities(User user) {
-		Set<SimpleGrantedAuthority> authorities;
-		authorities = new HashSet<>();
+		Set<SimpleGrantedAuthority> authorities = new HashSet<>();
 		
-		SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_BASIC");
-		authorities.add(authority);
-		
-//		authorities = user.getPermissions().stream()
-//				.map(p -> p.getDescription().toUpperCase())
-//				.map(SimpleGrantedAuthority::new)
-//				.collect(Collectors.toSet());
+		authorities = user.getPermissions().stream()
+				.map(p -> p.getDescription().toUpperCase())
+				.map(SimpleGrantedAuthority::new)
+				.collect(Collectors.toSet());
 		return authorities;
 	}
 }

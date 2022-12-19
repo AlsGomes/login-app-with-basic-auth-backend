@@ -39,12 +39,14 @@ public class AuthenticationService {
 		this.userService = userService;
 	}
 
-	public void authenticate(LoginDTO dto) {
+	public User authenticate(LoginDTO dto) {
 		UserDetails user = userDetailsService.loadUserByUsername(dto.getEmail());
 		boolean isAuthenticated = passwordEncoder.matches(dto.getPassword(), user.getPassword());
 
 		if (!isAuthenticated)
 			throw new AuthenticationException("Usuário ou senha inválidos");
+
+		return ((AppUser) user).getUser();
 	}
 
 	public void beginRecoveryPasswordFlow(@Valid ForgotPasswordDTO dto) {
