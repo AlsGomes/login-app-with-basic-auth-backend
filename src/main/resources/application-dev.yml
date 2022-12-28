@@ -5,11 +5,16 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
     open-in-view: false
+
   datasource:
     url: jdbc:mysql://localhost:3306/login_app_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: 123
+
   flyway:
     locations:
     - db/migration
     - db/insertData
+
+app:
+  allowedOrigin: http://localhost:4200

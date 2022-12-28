@@ -37,7 +37,7 @@ public class AppUserDetailsService implements UserDetailsService {
 		Set<SimpleGrantedAuthority> authorities = new HashSet<>();
 		
 		authorities = user.getPermissions().stream()
-				.map(p -> p.getDescription().toUpperCase())
+				.map(p -> p.getName().toUpperCase())
 				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toSet());
 		return authorities;
