@@ -49,7 +49,7 @@ public class AuthenticationService {
 		return ((AppUser) user).getUser();
 	}
 
-	public void beginRecoveryPasswordFlow(@Valid ForgotPasswordDTO dto) {
+	public String beginRecoveryPasswordFlow(@Valid ForgotPasswordDTO dto) {
 		User user = getUserByEmail(dto.getEmail());
 
 		String passwordEncoded = passwordEncoder.encode(user.getPassword());
@@ -58,6 +58,7 @@ public class AuthenticationService {
 		String encodedToken = Base64.getEncoder().encodeToString(rawToken.getBytes());
 
 		communicationService.communicate(user, "Criação de nova senha", encodedToken);
+		return encodedToken;
 	}
 
 	public void createNewPassword(NewPasswordDTO dto) {

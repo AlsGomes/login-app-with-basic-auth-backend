@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.agdev.api.dto.security.ForgotPasswordDTO;
 import br.com.agdev.api.dto.security.LoginDTO;
 import br.com.agdev.api.dto.security.NewPasswordDTO;
+import br.com.agdev.api.dto.security.TokenResponseDTO;
 import br.com.agdev.api.dto.user.UserDTOPermission;
 import br.com.agdev.api.mapper.user.UserPermissionMapper;
 import br.com.agdev.domain.model.User;
@@ -36,9 +37,10 @@ public class AuthenticationResource {
 	}
 
 	@PostMapping("/forgot-password")
-	public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordDTO dto) {
-		authenticationService.beginRecoveryPasswordFlow(dto);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<TokenResponseDTO> forgotPassword(@RequestBody @Valid ForgotPasswordDTO dto) {
+		TokenResponseDTO token = new TokenResponseDTO();
+		token.setToken(authenticationService.beginRecoveryPasswordFlow(dto));
+		return ResponseEntity.ok(token);
 	}
 	
 	@PostMapping("/create-new-password")
