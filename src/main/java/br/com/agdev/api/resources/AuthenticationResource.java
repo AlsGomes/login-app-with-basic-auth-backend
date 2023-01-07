@@ -29,11 +29,12 @@ public class AuthenticationResource {
 		this.userPermissionMapper = new UserPermissionMapper();
 	}
 
+	// TODO Change the return type from String to DTO
 	@PostMapping("/login")
-	public ResponseEntity<UserDTOPermission> login(@RequestBody @Valid LoginDTO loginDto) {
-		User user = authenticationService.authenticate(loginDto);
-		UserDTOPermission userPermissionDto = userPermissionMapper.toDTO(user);
-		return ResponseEntity.ok(userPermissionDto);
+	public ResponseEntity<String> login(@RequestBody @Valid LoginDTO loginDto) {
+		String token = authenticationService.authenticate(loginDto);
+//		UserDTOPermission userPermissionDto = userPermissionMapper.toDTO(user);
+		return ResponseEntity.ok(token);
 	}
 
 	@PostMapping("/forgot-password")

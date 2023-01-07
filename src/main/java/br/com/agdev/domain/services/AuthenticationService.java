@@ -14,39 +14,29 @@ import br.com.agdev.api.dto.security.ForgotPasswordDTO;
 import br.com.agdev.api.dto.security.LoginDTO;
 import br.com.agdev.api.dto.security.NewPasswordDTO;
 import br.com.agdev.core.security.AppUser;
+import br.com.agdev.core.security.JwtUtils;
 import br.com.agdev.core.security.exceptions.AuthenticationException;
 import br.com.agdev.domain.model.User;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class AuthenticationService {
 
 	private UserDetailsService userDetailsService;
 	private PasswordEncoder passwordEncoder;
-
 	private CommunicationService communicationService;
-	
 	private UserService userService;
+	private JwtUtils jwtUtils;
 
-	public AuthenticationService(
-			UserDetailsService userDetailsService, 
-			PasswordEncoder passwordEncoder,
-			CommunicationService communicationService,
-			UserService userService) {
-
-		this.userDetailsService = userDetailsService;
-		this.passwordEncoder = passwordEncoder;
-		this.communicationService = communicationService;
-		this.userService = userService;
-	}
-
-	public User authenticate(LoginDTO dto) {
+	public String authenticate(LoginDTO dto) {
 		UserDetails user = userDetailsService.loadUserByUsername(dto.getEmail());
 		boolean isAuthenticated = passwordEncoder.matches(dto.getPassword(), user.getPassword());
 
 		if (!isAuthenticated)
 			throw new AuthenticationException("Usuário ou senha inválidos");
 
-		return ((AppUser) user).getUser();
+		return jwtUtils.generateToken(user);
 	}
 
 	public String beginRecoveryPasswordFlow(@Valid ForgotPasswordDTO dto) {
